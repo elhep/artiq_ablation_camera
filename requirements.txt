@@ -1,0 +1,5 @@
+numpy
+asyncserial
+pytest
+pillow
+sipyco @ git+https://github.com/m-labs/sipyco.git@master#egg=sipyco
