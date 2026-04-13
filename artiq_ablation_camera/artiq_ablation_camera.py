@@ -100,149 +100,149 @@ class AblationCamera(AblationCameraInterface):
         except ValueError:
             return COMMAND_STATUS.PARSE_ERROR
 
-    def get_camera_exposure(self) -> Union[str, int]:
+    async def get_camera_exposure(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.CAM_EXPOSURE)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_camera_exposure(self, val: int) -> str:
+    async def set_camera_exposure(self, val: int) -> str:
         return self._send_write_command(COMMANDS.CAM_EXPOSURE, val).value
 
-    def get_camera_gain(self) -> Union[str, int]:
+    async def get_camera_gain(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.CAM_GAIN)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_camera_gain(self, val: int) -> str:
+    async def set_camera_gain(self, val: int) -> str:
         return self._send_write_command(COMMANDS.CAM_GAIN, val).value
 
-    def get_camera_brightness(self) -> Union[str, int]:
+    async def get_camera_brightness(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.CAM_BRIGHTNESS)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_camera_brightness(self, val: int) -> str:
+    async def set_camera_brightness(self, val: int) -> str:
         return self._send_write_command(COMMANDS.CAM_BRIGHTNESS, val).value
 
-    def get_camera_contrast(self) -> Union[str, int]:
+    async def get_camera_contrast(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.CAM_CONTRAST)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_camera_contrast(self, val: int) -> str:
+    async def set_camera_contrast(self, val: int) -> str:
         return self._send_write_command(COMMANDS.CAM_CONTRAST, val).value
 
 
-    def get_ROI_x0(self) -> Union[str, int]:
+    async def get_ROI_x0(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.ROI_X0)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_ROI_x0(self, val: int) -> str:
+    async def set_ROI_x0(self, val: int) -> str:
         return self._send_write_command(COMMANDS.ROI_X0, val).value
 
-    def get_ROI_y0(self) -> Union[str, int]:
+    async def get_ROI_y0(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.ROI_Y0)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_ROI_y0(self, val: int) -> str:
+    async def set_ROI_y0(self, val: int) -> str:
         return self._send_write_command(COMMANDS.ROI_Y0, val).value
 
-    def get_ROI_dx(self) -> Union[str, int]:
+    async def get_ROI_dx(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.ROI_DX)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_ROI_dx(self, val: int) -> str:
+    async def set_ROI_dx(self, val: int) -> str:
         return self._send_write_command(COMMANDS.ROI_DX, val).value
 
-    def get_ROI_dy(self) -> Union[str, int]:
+    async def get_ROI_dy(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.ROI_DY)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_ROI_dy(self, val: int) -> str:
+    async def set_ROI_dy(self, val: int) -> str:
         return self._send_write_command(COMMANDS.ROI_DY, val).value
 
-    def get_ROI_enable(self) -> Union[str, int]:
+    async def get_ROI_enable(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.ROI_ENABLE)
         if type(val) == float:
             return int(val)
         return val.value
 
-    def set_ROI_enable(self, val: int) -> str:
+    async def set_ROI_enable(self, val: int) -> str:
         return self._send_write_command(COMMANDS.ROI_ENABLE, val).value
 
 
-    def get_target_x0(self) -> Union[str, float]:
+    async def get_target_x0(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_X0)
         if type(val) == float:
             return val
         return val.value
 
-    def set_target_x0(self, val: float) -> str:
+    async def set_target_x0(self, val: float) -> str:
         return self._send_write_command(COMMANDS.TARGET_X0, val).value
 
-    def get_target_y0(self) -> Union[str, float]:
+    async def get_target_y0(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_Y0)
         if type(val) == float:
             return val
         return val.value
 
-    def set_target_y0(self, val: float) -> str:
+    async def set_target_y0(self, val: float) -> str:
         return self._send_write_command(COMMANDS.TARGET_Y0, val).value
 
-    def get_target_tolerance(self) -> Union[str, float]:
+    async def get_target_tolerance(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_TOLERANCE)
         if type(val) == float:
             return val
         return val.value
 
-    def set_target_tolerance(self, val: float) -> str:
+    async def set_target_tolerance(self, val: float) -> str:
         return self._send_write_command(COMMANDS.TARGET_TOLERANCE, val).value
 
-    def get_target_error_x(self) -> Union[str, float]:
+    async def get_target_error_x(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_ERRX)
         if type(val) == float:
             return val
         return val.value
 
-    def get_target_error_y(self) -> Union[str, float]:
+    async def get_target_error_y(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_ERRY)
         if type(val) == float:
             return val
         return val.value
 
-    def get_target_is_hit(self) -> Union[str, int]:
+    async def get_target_is_hit(self) -> Union[str, int]:
         val = self._send_read_command(COMMANDS.TARGET_HIT)
         if type(val) == float:
             return int(val)
         return val.value
 
 
-    def get_centroid_x0(self) -> Union[str, float]:
+    async def get_centroid_x0(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_X0)
         if type(val) == float:
             return val
         return val.value
 
-    def get_centroid_y0(self) -> Union[str, float]:
+    async def get_centroid_y0(self) -> Union[str, float]:
         val = self._send_read_command(COMMANDS.TARGET_X0)
         if type(val) == float:
             return val
         return val.value
 
 
-    def trigger_capture_image(self) -> str:
+    async def trigger_capture_image(self) -> str:
         if self.serial is None:
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_CAPTURE.value} \r\n"
@@ -254,7 +254,7 @@ class AblationCamera(AblationCameraInterface):
             return parsed_resp.value
         return COMMAND_STATUS.COM_ERROR.value
 
-    def get_image(self) -> Union[str, list[list[list[int]]]]:
+    async def get_image(self) -> Union[str, list[list[list[int]]]]:
         if self.serial is None:
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"

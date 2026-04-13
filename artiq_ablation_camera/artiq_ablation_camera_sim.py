@@ -42,113 +42,113 @@ class AblationCameraSim(AblationCameraInterface):
     def close(self):
         pass
     
-    def get_camera_exposure(self) -> Union[str, int]:
+    async def get_camera_exposure(self) -> Union[str, int]:
         return self.camera.exposure
 
-    def set_camera_exposure(self, val: int) -> str:
+    async def set_camera_exposure(self, val: int) -> str:
         self.camera.exposure = val
         return ":OK"
 
-    def get_camera_gain(self) -> Union[str, int]:
+    async def get_camera_gain(self) -> Union[str, int]:
         return self.camera.gain
 
-    def set_camera_gain(self, val: int) -> str:
+    async def set_camera_gain(self, val: int) -> str:
         self.camera.gain = val
         return ":OK"
 
-    def get_camera_brightness(self) -> Union[str, int]:
+    async def get_camera_brightness(self) -> Union[str, int]:
         return self.camera.brightness
 
-    def set_camera_brightness(self, val: int) -> str:
+    async def set_camera_brightness(self, val: int) -> str:
         self.camera.brightness = val
         return ":OK"
 
-    def get_camera_contrast(self) -> Union[str, int]:
+    async def get_camera_contrast(self) -> Union[str, int]:
         return self.camera.contrast
 
-    def set_camera_contrast(self, val: int) -> str:
+    async def set_camera_contrast(self, val: int) -> str:
         self.camera.contrast = val
         return ":OK"
 
 
-    def get_ROI_x0(self) -> Union[str, int]:
+    async def get_ROI_x0(self) -> Union[str, int]:
         return self.roi.x0
 
-    def set_ROI_x0(self, val: int) -> str:
+    async def set_ROI_x0(self, val: int) -> str:
         self.roi.x0 = val
         return ":OK"
 
-    def get_ROI_y0(self) -> Union[str, int]:
+    async def get_ROI_y0(self) -> Union[str, int]:
         return self.roi.y0
 
-    def set_ROI_y0(self, val: int) -> str:
+    async def set_ROI_y0(self, val: int) -> str:
         self.roi.y0 = val
         return ":OK"
 
-    def get_ROI_dx(self) -> Union[str, int]:
+    async def get_ROI_dx(self) -> Union[str, int]:
         return self.roi.dx
 
-    def set_ROI_dx(self, val: int) -> str:
+    async def set_ROI_dx(self, val: int) -> str:
         self.roi.dx = val
         return ":OK"
 
-    def get_ROI_dy(self) -> Union[str, int]:
+    async def get_ROI_dy(self) -> Union[str, int]:
         return self.roi.dy
 
-    def set_ROI_dy(self, val: int) -> str:
+    async def set_ROI_dy(self, val: int) -> str:
         self.roi.dy = val
         return ":OK"
 
-    def get_ROI_enable(self) -> Union[str, int]:
+    async def get_ROI_enable(self) -> Union[str, int]:
         return self.roi.enable
 
-    def set_ROI_enable(self, val: int) -> str:
+    async def set_ROI_enable(self, val: int) -> str:
         self.roi.enable = val
         return ":OK"
 
 
-    def get_target_x0(self) -> Union[str, float]:
+    async def get_target_x0(self) -> Union[str, float]:
         return self.target.x0
 
-    def set_target_x0(self, val: float) -> str:
+    async def set_target_x0(self, val: float) -> str:
         self.target.x0 = val
         return ":OK"
 
-    def get_target_y0(self) -> Union[str, float]:
+    async def get_target_y0(self) -> Union[str, float]:
         return self.target.y0
 
-    def set_target_y0(self, val: float) -> str:
+    async def set_target_y0(self, val: float) -> str:
         self.target.y0 = val
         return ":OK"
 
-    def get_target_tolerance(self) -> Union[str, float]:
+    async def get_target_tolerance(self) -> Union[str, float]:
         return self.target.tolerance
 
-    def set_target_tolerance(self, val: float) -> str:
+    async def set_target_tolerance(self, val: float) -> str:
         self.target.tolerance = val
         return ":OK"
 
-    def get_target_error_x(self) -> Union[str, float]:
+    async def get_target_error_x(self) -> Union[str, float]:
         return self.target.error_x
 
-    def get_target_error_y(self) -> Union[str, float]:
+    async def get_target_error_y(self) -> Union[str, float]:
         return self.target.error_y
 
-    def get_target_is_hit(self) -> Union[str, int]:
+    async def get_target_is_hit(self) -> Union[str, int]:
         return self.target.is_hit
 
 
-    def get_centroid_x0(self) -> Union[str, float]:
+    async def get_centroid_x0(self) -> Union[str, float]:
         return self.centroid.x0
 
-    def get_centroid_y0(self) -> Union[str, float]:
+    async def get_centroid_y0(self) -> Union[str, float]:
         return self.centroid.y0
 
 
-    def trigger_capture_image(self) -> str:
+    async def trigger_capture_image(self) -> str:
         return ":OK"
 
-    def get_image(self) -> Union[str, list[list[list[int]]]]:
+    async def get_image(self) -> Union[str, list[list[list[int]]]]:
         ret_image: list[list[list[int]]] = []
         for i in range(360):
             ret_image.append([])
