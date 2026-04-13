@@ -74,7 +74,8 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR
         cmd = f"{command.value} {value}\r\n"
         self.serial.write(cmd.encode("ascii"))
-        resp = self.serial.readline().decode("ascii")
+        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            pass
         parsed_resp = self._parse_response(resp)
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp
@@ -85,7 +86,8 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR
         cmd = f"{command.value}?\r\n"
         self.serial.write(cmd.encode("ascii"))
-        resp = self.serial.readline().decode("ascii")
+        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            pass
         return self._parse_response(resp)
 
     def _parse_response(self, response: str) -> Union[COMMAND_STATUS, float]:
@@ -245,7 +247,8 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_CAPTURE.value} \r\n"
         self.serial.write(cmd.encode("ascii"))
-        resp = self.serial.readline().decode("ascii")
+        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            pass
         parsed_resp = self._parse_response(resp)
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp.value
@@ -256,15 +259,23 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
         self.serial.write(cmd.encode("ascii"))
-        read_ok = False
-        data = b''
-        while (chunk := self.serial.read(CHUNK_SIZE)) != b'':
-            data += chunk
-            if chunk[-4:] == "END\n":
-                read_ok = True
-                break
-        if not read_ok:
-            return COMMAND_STATUS.COM_ERROR.value
+        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            pass
+        size = int(resp.split()[1])
+        # read_ok = False
+        data = self.serial.read(size)
+        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            pass
+        resp = self._parse_response(resp)
+        if resp != COMMAND_STATUS.OK:
+            return resp.value
+        # # while (chunk := self.serial.read(CHUNK_SIZE)) != b'':
+        # #     data += chunk
+        # #     if chunk[-4:] == "END\n":
+        # #         read_ok = True
+        # #         break
+        # if not read_ok:
+        #     return COMMAND_STATUS.COM_ERROR.value
         image = Image.open(BytesIO(data))
         arr_image = np.array(image)
         return arr_image.tolist()
