@@ -277,5 +277,26 @@ class AblationCamera(AblationCameraInterface):
         # if not read_ok:
         #     return COMMAND_STATUS.COM_ERROR.value
         image = Image.open(BytesIO(data))
-        arr_image = np.array(image)
+        try:
+            img = Image.frombytes(
+                "RGB",
+                (640, 480),
+                data,
+                "raw",
+                "BGR"
+            )
+        except:
+            try:
+                img = Image.frombytes(
+                    "L",
+                    (640, 480),
+                    data,
+                    "raw",
+                    "L"
+                )
+            except:
+                img = None
+        if img is None:
+            return COMMAND_STATUS.ERROR.value
+        arr_image = np.array(img)
         return arr_image.tolist()
