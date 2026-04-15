@@ -305,5 +305,5 @@ class AblationCamera(AblationCameraInterface):
                 img = None
         if img is None:
             return COMMAND_STATUS.ERROR.value
-        arr_image = np.array(img)
+        arr_image = np.array(img, dtype=np.uint8)
         return arr_image.tolist()
