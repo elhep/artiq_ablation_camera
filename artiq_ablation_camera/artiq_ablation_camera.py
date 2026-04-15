@@ -268,11 +268,13 @@ class AblationCamera(AblationCameraInterface):
         print(f"Read Bytes: {size}")
         # read_ok = False
         data = self.serial.read(size)
+        print("Image received")
         while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
             pass
         resp = self._parse_response(resp)
         if resp != COMMAND_STATUS.OK:
             return resp.value
+        print(resp.value)
         # # while (chunk := self.serial.read(CHUNK_SIZE)) != b'':
         # #     data += chunk
         # #     if chunk[-4:] == "END\n":
@@ -289,6 +291,7 @@ class AblationCamera(AblationCameraInterface):
                 "raw",
                 "BGR"
             )
+            print("RGB image parsed")
         except:
             try:
                 img = Image.frombytes(
