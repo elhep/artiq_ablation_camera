@@ -280,7 +280,7 @@ class AblationCamera(AblationCameraInterface):
         # #         break
         # if not read_ok:
         #     return COMMAND_STATUS.COM_ERROR.value
-        image = Image.open(BytesIO(data))
+        # image = Image.open(BytesIO(data))
         try:
             img = Image.frombytes(
                 "RGB",
