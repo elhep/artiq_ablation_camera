@@ -5,6 +5,7 @@ import serial
 from typing import Optional, Union
 from PIL import Image
 from io import BytesIO
+import logging
 
 CHUNK_SIZE = 1024
 
@@ -73,9 +74,11 @@ class AblationCamera(AblationCameraInterface):
         if self.serial is None:
             return COMMAND_STATUS.COM_ERROR
         cmd = f"{command.value} {value}\r\n"
+        logging.debug(f"CMD: {cmd}")
         self.serial.write(cmd.encode("ascii"))
         while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
             pass
+        logging.debug("RSP: {resp}")
         parsed_resp = self._parse_response(resp)
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp
@@ -245,7 +248,7 @@ class AblationCamera(AblationCameraInterface):
     async def trigger_capture_image(self) -> str:
         if self.serial is None:
             return COMMAND_STATUS.COM_ERROR.value
-        cmd = f"{COMMANDS.IMAGE_CAPTURE.value} \r\n"
+        cmd = f"{COMMANDS.IMAGE_CAPTURE.value}\r\n"
         self.serial.write(cmd.encode("ascii"))
         while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
             pass
@@ -259,12 +262,13 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
         self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
             pass
         size = int(resp.split()[1])
+        print(f"Read Bytes: {size}")
         # read_ok = False
         data = self.serial.read(size)
-        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
             pass
         resp = self._parse_response(resp)
         if resp != COMMAND_STATUS.OK:
