@@ -267,8 +267,10 @@ class AblationCamera(AblationCameraInterface):
         size = int(resp.split()[1])
         print(f"Read Bytes: {size}")
         # read_ok = False
+        self.serial.timeout = 5
         data = self.serial.read(size)
-        print("Image received")
+        self.serial.timeout = 1
+        print(f"Image received: {len(data)} bytes")
         while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
             pass
         resp = self._parse_response(resp)
