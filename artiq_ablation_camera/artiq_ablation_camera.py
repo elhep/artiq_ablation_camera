@@ -54,6 +54,9 @@ class AblationCamera(AblationCameraInterface):
         self.serial: Optional[serial.Serial] = None
         self._status_update_active = False
         self.connect()
+    
+    def log(self, msg: str) -> None:
+        print(f"[{self.__class__.__name__}] {msg}")
 
     def connect(self) -> None:
         """Open serial connection to the controller."""
@@ -73,13 +76,21 @@ class AblationCamera(AblationCameraInterface):
     
     def _send_write_command(self, command: COMMANDS, value: Union[int, float]) -> COMMAND_STATUS:
         if self.serial is None:
+            self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR
+        
         cmd = f"{command.value} {value}\r\n"
-        logging.debug(f"CMD: {cmd}")
-        self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
-            pass
-        logging.debug("RSP: {resp}")
+        self.log(f"Write command: {cmd}")
+
+        try:
+            self.serial.write(cmd.encode(errors="ignore"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            self.log(f"Write response: {resp}")
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR
+
         parsed_resp = self._parse_response(resp)
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp
@@ -87,11 +98,19 @@ class AblationCamera(AblationCameraInterface):
     
     def _send_read_command(self, command: COMMANDS) -> Union[COMMAND_STATUS, float]:
         if self.serial is None:
+            self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR
         cmd = f"{command.value}?\r\n"
-        self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
-            pass
+        self.log(f"Read command: {cmd}")
+
+        try:
+            self.serial.write(cmd.encode(errors="ignore"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            self.log(f"Read response: {resp}")
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR
         return self._parse_response(resp)
 
     def _parse_response(self, response: str) -> Union[COMMAND_STATUS, float]:
@@ -248,11 +267,21 @@ class AblationCamera(AblationCameraInterface):
 
     async def trigger_capture_image(self) -> str:
         if self.serial is None:
+            self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR.value
+        
         cmd = f"{COMMANDS.IMAGE_CAPTURE.value}\r\n"
-        self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
-            pass
+        self.log(f"Trigger capture command: {cmd}")
+
+        try:
+            self.serial.write(cmd.encode("ascii"))
+            while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+                pass
+            self.log(f"Response: {resp}")
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR.value
+
         parsed_resp = self._parse_response(resp)
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp.value
@@ -260,25 +289,35 @@ class AblationCamera(AblationCameraInterface):
 
     async def get_image(self) -> Union[str, list[list[int]]]:
         if self.serial is None:
+            self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR.value
+        
         cmd = f"{COMMANDS.IMAGE_GET.value}?\r\n"
-        self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
-            pass
-        size = int(resp.split()[1])
-        print(f"Read Bytes: {size}")
+        self.log(f"Get image command: {cmd}")
 
-        self.serial.timeout = 5
-        data = self.serial.read(size)
-        self.serial.timeout = 1
+        try:
+            self.serial.write(cmd.encode(errors="ignore"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            size = int(resp.split()[1])
+            self.log(f"IMG expected byte count: {size}")
 
-        print(f"Image received: {len(data)} bytes")
-        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
-            pass
-        resp = self._parse_response(resp)
+            self.serial.timeout = 5
+            data = self.serial.read(size)
+            self.serial.timeout = 1
+
+            self.log(f"IMG read byte count: {len(data)}")
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            resp = self._parse_response(resp)
+            self.log(f"Response: {resp}")
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR.value
+        
         if resp != COMMAND_STATUS.OK:
             return resp.value
-        print(resp.value)
+        
         try:
             img = Image.frombytes(
                 "L",
@@ -288,33 +327,42 @@ class AblationCamera(AblationCameraInterface):
                 "L"
             )
         except:
-            img = None
-        if img is None:
-            return COMMAND_STATUS.ERROR.value
+            self.log("Parsing image failed")
+            return COMMAND_STATUS.PARSE_ERROR.value
+        
         arr_image = np.array(img, dtype=np.uint8)
         return arr_image.tolist()
     
     async def get_image_preview(self) -> Union[str, list[list[list[int]]]]:
         if self.serial is None:
+            self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR.value
+
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
-        self.serial.write(cmd.encode("ascii"))
-        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
-            pass
-        size = int(resp.split()[1])
-        print(f"Read Bytes: {size}")
+        self.log(f"Get image command: {cmd}")
+        try:
+            self.serial.write(cmd.encode("ascii"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            size = int(resp.split()[1])
+            self.log(f"IMG expected byte count: {size}")
 
-        self.serial.timeout = 5
-        data = self.serial.read(size)
-        self.serial.timeout = 1
+            self.serial.timeout = 5
+            data = self.serial.read(size)
+            self.serial.timeout = 1
 
-        print(f"Image received: {len(data)} bytes")
-        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
-            pass
-        resp = self._parse_response(resp)
+            self.log(f"IMG read byte count: {len(data)}")
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            resp = self._parse_response(resp)
+            self.log(f"Response: {resp}")
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR.value
+        
         if resp != COMMAND_STATUS.OK:
             return resp.value
-        print(resp.value)
+        
         try:
             img = Image.frombytes(
                 "RGB",
@@ -323,10 +371,9 @@ class AblationCamera(AblationCameraInterface):
                 "raw",
                 "BGR"
             )
-            print("RGB image parsed")
         except:
-            img = None
-        if img is None:
-            return COMMAND_STATUS.ERROR.value
+            self.log("Parsing image failed")
+            return COMMAND_STATUS.PARSE_ERROR.value
+        
         arr_image = np.array(img, dtype=np.uint8)
         return arr_image.tolist()
