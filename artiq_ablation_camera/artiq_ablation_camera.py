@@ -80,7 +80,7 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR
         
         cmd = f"{command.value} {value}\r\n"
-        self.log(f"Write command: {cmd}")
+        self.log(f"Write command: {cmd.strip()}")
 
         try:
             self.serial.write(cmd.encode(errors="ignore"))
@@ -101,7 +101,7 @@ class AblationCamera(AblationCameraInterface):
             self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR
         cmd = f"{command.value}?\r\n"
-        self.log(f"Read command: {cmd}")
+        self.log(f"Read command: {cmd.strip()}")
 
         try:
             self.serial.write(cmd.encode(errors="ignore"))
@@ -271,11 +271,11 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         
         cmd = f"{COMMANDS.IMAGE_CAPTURE.value}\r\n"
-        self.log(f"Trigger capture command: {cmd}")
+        self.log(f"Trigger capture command: {cmd.strip()}")
 
         try:
-            self.serial.write(cmd.encode("ascii"))
-            while not (resp := self.serial.readline().decode("ascii")).startswith(":"):
+            self.serial.write(cmd.encode(errors="ignore"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
             self.log(f"Response: {resp}")
         except:
@@ -293,7 +293,7 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         
         cmd = f"{COMMANDS.IMAGE_GET.value}?\r\n"
-        self.log(f"Get image command: {cmd}")
+        self.log(f"Get image command: {cmd.strip()}")
 
         try:
             self.serial.write(cmd.encode(errors="ignore"))
