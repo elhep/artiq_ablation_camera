@@ -275,8 +275,20 @@ class AblationCameraInterface(abc.ABC):
         '''
 
     @abc.abstractmethod
-    async def get_image(self) -> Union[str, list[list[list[int]]]]:
+    async def get_image(self) -> Union[str, list[list[int]]]:
         '''Get the whole grayscale image
+
+        Returns:
+            Operation status in case of an error
+            Image as a list
+            [[Gr, ..., Gr]
+                 .      .       .            
+             [Gr, ..., Gr]]
+        '''
+
+    @abc.abstractmethod
+    async def get_image_preview(self) -> Union[str, list[list[list[int]]]]:
+        '''Get the whole grayscale image  with marked ROI
 
         Returns:
             Operation status in case of an error

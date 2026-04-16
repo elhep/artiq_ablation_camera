@@ -33,6 +33,7 @@ class COMMANDS(Enum):
 
     IMAGE_CAPTURE = ":image:capture"
     IMAGE_PREV = ":image:preview"
+    IMAGE_GET = ":image:image"
 
 class COMMAND_STATUS(Enum):
     OK = ":OK"
@@ -257,7 +258,43 @@ class AblationCamera(AblationCameraInterface):
             return parsed_resp.value
         return COMMAND_STATUS.COM_ERROR.value
 
-    async def get_image(self) -> Union[str, list[list[list[int]]]]:
+    async def get_image(self) -> Union[str, list[list[int]]]:
+        if self.serial is None:
+            return COMMAND_STATUS.COM_ERROR.value
+        cmd = f"{COMMANDS.IMAGE_GET.value}?\r\n"
+        self.serial.write(cmd.encode("ascii"))
+        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+            pass
+        size = int(resp.split()[1])
+        print(f"Read Bytes: {size}")
+
+        self.serial.timeout = 5
+        data = self.serial.read(size)
+        self.serial.timeout = 1
+
+        print(f"Image received: {len(data)} bytes")
+        while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+            pass
+        resp = self._parse_response(resp)
+        if resp != COMMAND_STATUS.OK:
+            return resp.value
+        print(resp.value)
+        try:
+            img = Image.frombytes(
+                "L",
+                (640, 480),
+                data,
+                "raw",
+                "L"
+            )
+        except:
+            img = None
+        if img is None:
+            return COMMAND_STATUS.ERROR.value
+        arr_image = np.array(img, dtype=np.uint8)
+        return arr_image.tolist()
+    
+    async def get_image_preview(self) -> Union[str, list[list[list[int]]]]:
         if self.serial is None:
             return COMMAND_STATUS.COM_ERROR.value
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
@@ -266,10 +303,11 @@ class AblationCamera(AblationCameraInterface):
             pass
         size = int(resp.split()[1])
         print(f"Read Bytes: {size}")
-        # read_ok = False
+
         self.serial.timeout = 5
         data = self.serial.read(size)
         self.serial.timeout = 1
+
         print(f"Image received: {len(data)} bytes")
         while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
             pass
@@ -277,14 +315,6 @@ class AblationCamera(AblationCameraInterface):
         if resp != COMMAND_STATUS.OK:
             return resp.value
         print(resp.value)
-        # # while (chunk := self.serial.read(CHUNK_SIZE)) != b'':
-        # #     data += chunk
-        # #     if chunk[-4:] == "END\n":
-        # #         read_ok = True
-        # #         break
-        # if not read_ok:
-        #     return COMMAND_STATUS.COM_ERROR.value
-        # image = Image.open(BytesIO(data))
         try:
             img = Image.frombytes(
                 "RGB",
@@ -295,16 +325,7 @@ class AblationCamera(AblationCameraInterface):
             )
             print("RGB image parsed")
         except:
-            try:
-                img = Image.frombytes(
-                    "L",
-                    (640, 480),
-                    data,
-                    "raw",
-                    "L"
-                )
-            except:
-                img = None
+            img = None
         if img is None:
             return COMMAND_STATUS.ERROR.value
         arr_image = np.array(img, dtype=np.uint8)
