@@ -309,8 +309,9 @@ class AblationCamera(AblationCameraInterface):
             self.log(f"IMG read byte count: {len(data)}")
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
+            self.log(f"IMG read response: {resp}")
             resp = self._parse_response(resp)
-            self.log(f"Response: {resp}")
+            
         except:
             self.log("Serial device caused an exception!")
             return COMMAND_STATUS.COM_ERROR.value
@@ -347,17 +348,17 @@ class AblationCamera(AblationCameraInterface):
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
             size = int(resp.split()[1])
-            self.log(f"IMG expected byte count: {size}")
+            self.log(f"IMG PREVIEW expected byte count: {size}")
 
             self.serial.timeout = 5
             data = self.serial.read(size)
             self.serial.timeout = 1
 
-            self.log(f"IMG read byte count: {len(data)}")
+            self.log(f"IMG PREVIEW read byte count: {len(data)}")
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
             resp = self._parse_response(resp)
-            self.log(f"Response: {resp}")
+            self.log(f"IMG PREVIEW response: {resp}")
         except:
             self.log("Serial device caused an exception!")
             return COMMAND_STATUS.COM_ERROR.value
