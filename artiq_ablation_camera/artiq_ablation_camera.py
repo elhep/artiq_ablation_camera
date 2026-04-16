@@ -316,7 +316,9 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         
         if resp != COMMAND_STATUS.OK:
-            return resp.value
+            if type(resp) == COMMAND_STATUS:
+                return resp.value
+            return str(resp)
         
         try:
             img = Image.frombytes(
@@ -361,7 +363,9 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         
         if resp != COMMAND_STATUS.OK:
-            return resp.value
+            if type(resp) == COMMAND_STATUS:
+                return resp.value
+            return str(resp)
         
         try:
             img = Image.frombytes(
