@@ -316,10 +316,10 @@ class AblationCamera(AblationCameraInterface):
             self.log("Serial device caused an exception!")
             return COMMAND_STATUS.COM_ERROR.value
         
-        if resp != COMMAND_STATUS.OK:
-            if type(resp) == COMMAND_STATUS:
-                return resp.value
-            return str(resp)
+        # if resp != COMMAND_STATUS.OK:
+        #     if type(resp) == COMMAND_STATUS:
+        #         return resp.value
+        #     return str(resp)
         
         try:
             img = Image.frombytes(
