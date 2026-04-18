@@ -147,6 +147,9 @@ class AblationCameraSim(AblationCameraInterface):
 
     async def trigger_capture_image(self) -> str:
         return ":OK"
+    
+    async def wait_for_image_ready(self) -> str:
+        return ":OK"
 
     async def get_image(self) -> Union[str, list[list[int]]]:
         ret_image: list[list[int]] = []

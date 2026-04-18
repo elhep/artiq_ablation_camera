@@ -273,6 +273,14 @@ class AblationCameraInterface(abc.ABC):
         Returns:
             Operation status
         '''
+    
+    @abc.abstractmethod
+    async def wait_for_image_ready(self) -> str:
+        '''Wait for ready image after external trigger
+        
+        Returns:
+            Operation status
+        '''
 
     @abc.abstractmethod
     async def get_image(self) -> Union[str, list[list[int]]]:

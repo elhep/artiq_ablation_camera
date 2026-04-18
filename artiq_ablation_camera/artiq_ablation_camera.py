@@ -289,6 +289,23 @@ class AblationCamera(AblationCameraInterface):
         if type(parsed_resp) == COMMAND_STATUS:
             return parsed_resp.value
         return COMMAND_STATUS.COM_ERROR.value
+    
+    async def wait_for_image_ready(self) -> str:
+        if self.serial is None:
+            self.log("Serial device not connected!")
+            return COMMAND_STATUS.COM_ERROR.value
+        try:
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            self.log(f"Response: {resp}")
+        except:
+            return COMMAND_STATUS.COM_ERROR.value
+        
+        parsed_resp = self._parse_response(resp)
+        if type(parsed_resp) == COMMAND_STATUS:
+            return parsed_resp.value
+        return COMMAND_STATUS.COM_ERROR.value
+
 
     async def get_image(self) -> Union[str, list[list[int]]]:
         if self.serial is None:
