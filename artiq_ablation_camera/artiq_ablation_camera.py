@@ -83,6 +83,7 @@ class AblationCamera(AblationCameraInterface):
         self.log(f"Write command: {cmd.strip()}")
 
         try:
+            self.serial.read_all()
             self.serial.write(cmd.encode(errors="ignore"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
@@ -104,6 +105,7 @@ class AblationCamera(AblationCameraInterface):
         self.log(f"Read command: {cmd.strip()}")
 
         try:
+            self.serial.read_all()
             self.serial.write(cmd.encode(errors="ignore"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
@@ -274,6 +276,7 @@ class AblationCamera(AblationCameraInterface):
         self.log(f"Trigger capture command: {cmd.strip()}")
 
         try:
+            self.serial.read_all()
             self.serial.write(cmd.encode(errors="ignore"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
@@ -296,6 +299,7 @@ class AblationCamera(AblationCameraInterface):
         self.log(f"Get image command: {cmd.strip()}")
 
         try:
+            self.serial.read_all()
             self.serial.write(cmd.encode(errors="ignore"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
@@ -309,7 +313,7 @@ class AblationCamera(AblationCameraInterface):
             self.log(f"IMG read byte count: {len(data)}")
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
-            self.log(f"IMG read response: {resp}")
+            self.log(f"IMG read response: {resp}") #TODO Check why it returns weird values
             resp = self._parse_response(resp)
             
         except:
@@ -344,6 +348,7 @@ class AblationCamera(AblationCameraInterface):
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
         self.log(f"Get image command: {cmd}")
         try:
+            self.serial.read_all()
             self.serial.write(cmd.encode("ascii"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
