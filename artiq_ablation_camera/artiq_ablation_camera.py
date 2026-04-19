@@ -255,13 +255,13 @@ class AblationCamera(AblationCameraInterface):
 
 
     async def get_centroid_x0(self) -> Union[str, float]:
-        val = self._send_read_command(COMMANDS.TARGET_X0)
+        val = self._send_read_command(COMMANDS.CENTROID_X0)
         if type(val) == float:
             return val
         return val.value
 
     async def get_centroid_y0(self) -> Union[str, float]:
-        val = self._send_read_command(COMMANDS.TARGET_Y0)
+        val = self._send_read_command(COMMANDS.CENTROID_Y0)
         if type(val) == float:
             return val
         return val.value
@@ -385,8 +385,8 @@ class AblationCamera(AblationCameraInterface):
             self.log(f"IMG PREVIEW read byte count: {len(data)}")
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
-            resp = self._parse_response(resp)
             self.log(f"IMG PREVIEW response: {resp}")
+            resp = self._parse_response(resp)
         except:
             self.log("Serial device caused an exception!")
             return COMMAND_STATUS.COM_ERROR.value
