@@ -295,7 +295,7 @@ class AblationCamera(AblationCameraInterface):
             self.log("Serial device not connected!")
             return COMMAND_STATUS.COM_ERROR.value
         try:
-            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+            while not (resp := self.serial.readline().decode(errors="ignore")):
                 pass
             self.log(f"Response: {resp}")
         except:
