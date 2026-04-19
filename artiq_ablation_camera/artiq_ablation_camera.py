@@ -261,7 +261,7 @@ class AblationCamera(AblationCameraInterface):
         return val.value
 
     async def get_centroid_y0(self) -> Union[str, float]:
-        val = self._send_read_command(COMMANDS.TARGET_X0)
+        val = self._send_read_command(COMMANDS.TARGET_Y0)
         if type(val) == float:
             return val
         return val.value
