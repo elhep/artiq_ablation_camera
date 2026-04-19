@@ -296,8 +296,11 @@ class AblationCamera(AblationCameraInterface):
             return COMMAND_STATUS.COM_ERROR.value
         try:
             self.serial.timeout = 5
-            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
-                pass
+            counter = 4
+            while not (resp := self.serial.readline().decode(errors="ignore")).endswith("Camera snapshot taken!"):
+                if counter == 0:
+                    break
+                counter -= 1
             self.log(f"Response: {resp}")
         except:
             return COMMAND_STATUS.COM_ERROR.value
