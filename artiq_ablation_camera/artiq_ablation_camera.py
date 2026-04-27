@@ -24,8 +24,8 @@ class COMMANDS(Enum):
     TARGET_X0 = ":target:x0"
     TARGET_Y0 = ":target:y0"
     TARGET_TOLERANCE = ":target:tolerance"
-    TARGET_ERRX = ":target:error_x"
-    TARGET_ERRY = ":target:error_y"
+    TARGET_ERRX = ":target:error:x"
+    TARGET_ERRY = ":target:error:y"
     TARGET_HIT = ":target:hit"
 
     CENTROID_X0 = ":centroid:x0"
@@ -58,7 +58,7 @@ class AblationCamera(AblationCameraInterface):
     def log(self, msg: str) -> None:
         print(f"[{self.__class__.__name__}] {msg}")
 
-    def connect(self) -> None:
+    def connect(self) -> COMMAND_STATUS:
         """Open serial connection to the controller."""
         try:
             self.serial = serial.Serial(
@@ -66,8 +66,11 @@ class AblationCamera(AblationCameraInterface):
                 baudrate=self.baudrate,
                 timeout=self.timeout
             )
-        except serial.SerialException as e:
-            raise AblationCameraException(f"Failed to connect to {self.device}: {e}")
+            self.log(f"Connected to {self.device}")
+        except serial.SerialException:
+            self.log(f"Failed to connect to {self.device}")
+            return COMMAND_STATUS.COM_ERROR
+        return COMMAND_STATUS.OK
     
     def close(self) -> None:
         """Close serial connection."""
@@ -76,8 +79,8 @@ class AblationCamera(AblationCameraInterface):
     
     def _send_write_command(self, command: COMMANDS, value: Union[int, float]) -> COMMAND_STATUS:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR
         
         cmd = f"{command.value} {value}\r\n"
         self.log(f"Write command: {cmd.strip()}")
@@ -99,8 +102,9 @@ class AblationCamera(AblationCameraInterface):
     
     def _send_read_command(self, command: COMMANDS) -> Union[COMMAND_STATUS, float]:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR
+
         cmd = f"{command.value}?\r\n"
         self.log(f"Read command: {cmd.strip()}")
 
@@ -269,8 +273,8 @@ class AblationCamera(AblationCameraInterface):
 
     async def trigger_capture_image(self) -> str:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR.value
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR.value
         
         cmd = f"{COMMANDS.IMAGE_CAPTURE.value}\r\n"
         self.log(f"Trigger capture command: {cmd.strip()}")
@@ -292,8 +296,9 @@ class AblationCamera(AblationCameraInterface):
     
     async def wait_for_image_ready(self) -> str:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR.value
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR.value
+
         try:
             self.serial.timeout = 5
             counter = 4
@@ -315,8 +320,8 @@ class AblationCamera(AblationCameraInterface):
 
     async def get_image(self) -> Union[str, list[list[int]]]:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR.value
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR.value
         
         cmd = f"{COMMANDS.IMAGE_GET.value}?\r\n"
         self.log(f"Get image command: {cmd.strip()}")
@@ -365,8 +370,8 @@ class AblationCamera(AblationCameraInterface):
     
     async def get_image_preview(self) -> Union[str, list[list[list[int]]]]:
         if self.serial is None:
-            self.log("Serial device not connected!")
-            return COMMAND_STATUS.COM_ERROR.value
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR.value
 
         cmd = f"{COMMANDS.IMAGE_PREV.value}?\r\n"
         self.log(f"Get image command: {cmd}")
