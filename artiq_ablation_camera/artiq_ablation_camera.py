@@ -4,8 +4,6 @@ from enum import Enum
 import serial
 from typing import Optional, Union
 from PIL import Image
-from io import BytesIO
-import logging
 
 CHUNK_SIZE = 1024
 
@@ -34,6 +32,7 @@ class COMMANDS(Enum):
     IMAGE_CAPTURE = ":image:capture"
     IMAGE_PREV = ":image:preview"
     IMAGE_GET = ":image:image"
+    IMAGE_ROI = ":image:roi"
 
 class COMMAND_STATUS(Enum):
     OK = ":OK"
@@ -318,6 +317,60 @@ class AblationCamera(AblationCameraInterface):
         return COMMAND_STATUS.COM_ERROR.value
 
 
+    async def get_roi_image(self) -> Union[str, list[list[int]]]:
+        if self.serial is None:
+            if self.connect() == COMMAND_STATUS.COM_ERROR:
+                return COMMAND_STATUS.COM_ERROR.value
+        
+        cmd = f"{COMMANDS.IMAGE_ROI.value}?\r\n"
+        self.log(f"Get image command: {cmd.strip()}")
+
+        try:
+            self.serial.read_all()
+            self.serial.write(cmd.encode(errors="ignore"))
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            tokens = resp.split()
+            w = tokens[1]
+            h = tokens[2]
+            b_count = tokens[3]
+            size = w * h * b_count
+            self.log(f"IMG expected byte count: {size}")
+
+            self.serial.timeout = 5
+            data = self.serial.read(size)
+            self.serial.timeout = 1
+
+            self.log(f"IMG read byte count: {len(data)}")
+            while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
+                pass
+            self.log(f"IMG read response: {resp}") #TODO Check why it returns weird values
+            resp = self._parse_response(resp)
+            
+        except:
+            self.log("Serial device caused an exception!")
+            return COMMAND_STATUS.COM_ERROR.value
+        
+        # if resp != COMMAND_STATUS.OK:
+        #     if type(resp) == COMMAND_STATUS:
+        #         return resp.value
+        #     return str(resp)
+        
+        try:
+            img = Image.frombytes(
+                "L",
+                (w, h),
+                data,
+                "raw",
+                "L"
+            )
+        except:
+            self.log("Parsing image failed")
+            return COMMAND_STATUS.PARSE_ERROR.value
+        
+        arr_image = np.array(img, dtype=np.uint8)
+        return arr_image.tolist()
+    
     async def get_image(self) -> Union[str, list[list[int]]]:
         if self.serial is None:
             if self.connect() == COMMAND_STATUS.COM_ERROR:
