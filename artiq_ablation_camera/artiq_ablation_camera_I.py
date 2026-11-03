@@ -283,6 +283,10 @@ class AblationCameraInterface(abc.ABC):
         '''
 
     @abc.abstractmethod
+    async def get_roi_image(self) -> Union[str, list[list[int]]]:
+        pass
+
+    @abc.abstractmethod
     async def get_image(self) -> Union[str, list[list[int]]]:
         '''Get the whole grayscale image
 
