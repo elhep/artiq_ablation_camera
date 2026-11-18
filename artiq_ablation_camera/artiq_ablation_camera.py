@@ -330,16 +330,16 @@ class AblationCamera(AblationCameraInterface):
             self.serial.write(cmd.encode(errors="ignore"))
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
                 pass
-            tokens = resp.split()
-            w = tokens[1]
-            h = tokens[2]
-            b_count = tokens[3]
+            tokens = resp.strip().split(' ')
+            w = int(tokens[1])
+            h = int(tokens[2])
+            b_count = int(tokens[3])
             size = w * h * b_count
             self.log(f"IMG expected byte count: {size}")
-
+            old_timeout = self.serial.timeout
             self.serial.timeout = 5
             data = self.serial.read(size)
-            self.serial.timeout = 1
+            self.serial.timeout = old_timeout
 
             self.log(f"IMG read byte count: {len(data)}")
             while not (resp := self.serial.readline().decode(errors="ignore")).startswith(":"):
